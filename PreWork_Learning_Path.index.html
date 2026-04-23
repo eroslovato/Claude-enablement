@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Enablement — Pre-work</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --blue: #0027FF;
+    --green: #00FF00;
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #e8e8e8;
+    --gray-300: #d0d0d0;
+    --gray-400: #999999;
+    --gray-500: #666666;
+    --gray-600: #333333;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    background: var(--black);
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topbar .logo {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+  .topbar .logo span { font-weight: 300; color: var(--gray-400); margin-left: 8px; }
+  .topbar .badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--black);
+    background: var(--green);
+    padding: 3px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 60px 40px 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -1px;
+  }
+  .hero h1 em { font-style: italic; color: var(--blue); }
+  .hero p.sub {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-top: 12px;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+
+  /* ===== LEVEL SELECTOR ===== */
+  .level-selector {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .level-card {
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .level-card:hover { border-color: var(--gray-400); }
+  .level-card.active { border-color: var(--blue); background: #f8f8ff; }
+  .level-card.l2.active { border-color: var(--green); background: #f8fff8; }
+  .level-card.l3.active { border-color: var(--black); background: var(--gray-50); }
+  .level-card .level-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .level-card.l1 .level-tag { color: var(--blue); }
+  .level-card.l2 .level-tag { color: #009900; }
+  .level-card.l3 .level-tag { color: var(--black); }
+  .level-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .level-card p { font-size: 11px; color: var(--gray-500); line-height: 1.5; }
+  .level-card .time {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gray-400);
+    background: var(--gray-100);
+    padding: 3px 10px;
+    border-radius: 10px;
+  }
+
+  /* ===== CONTENT AREA ===== */
+  .content-area {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px 60px;
+    display: none;
+  }
+  .content-area.visible { display: block; }
+
+  /* Progress bar */
+  .progress-container {
+    background: var(--gray-100);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-bar-fill.blue { background: var(--blue); }
+  .progress-bar-fill.green { background: var(--green); }
+  .progress-bar-fill.black { background: var(--black); }
+  .progress-text {
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 36px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .section-num.blue { background: var(--blue); }
+  .section-num.green { background: #009900; }
+  .section-num.black { background: var(--black); }
+  .section h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .section .section-desc {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-bottom: 16px;
+    padding-left: 44px;
+  }
+  .section .sep {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 0 0 16px 44px;
+  }
+
+  /* Task item */
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-left: 44px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .task:hover { background: var(--gray-50); }
+  .task.done { opacity: 0.5; }
+  .task.done .task-title { text-decoration: line-through; }
+
+  .task input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .task input[type="checkbox"]:checked {
+    background: var(--blue);
+    border-color: var(--blue);
+  }
+  .task input[type="checkbox"]:checked::after {
+    content: "\2713";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .task-content { flex: 1; }
+  .task-title { font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .task-desc { font-size: 11px; color: var(--gray-500); line-height: 1.5; margin-top: 3px; }
+  .task-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+  .task-link:hover { text-decoration: underline; }
+
+  .task-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .task-badge.video { background: #ffe8e8; color: #cc0000; }
+  .task-badge.read { background: #e8f0ff; color: var(--blue); }
+  .task-badge.exercise { background: #e8ffe8; color: #006600; }
+  .task-badge.setup { background: var(--gray-100); color: var(--gray-600); }
+
+  /* Embed */
+  .video-embed {
+    margin: 8px 0 0 44px;
+    padding: 12px 16px;
+    background: var(--gray-50);
+    border-radius: 6px;
+    border: 1px solid var(--gray-200);
+  }
+  .video-embed a {
+    font-size: 12px;
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Callout */
+  .callout {
+    margin: 16px 0 0 44px;
+    padding: 16px 20px;
+    background: var(--gray-50);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--gray-600);
+  }
+  .callout.green { border-left-color: var(--green); }
+  .callout.black { border-left-color: var(--black); }
+  .callout strong { font-weight: 600; color: var(--black); }
+
+  /* Completion */
+  .completion-banner {
+    display: none;
+    margin: 24px 0 0 44px;
+    padding: 20px 24px;
+    background: var(--black);
+    color: var(--white);
+    border-radius: 8px;
+    text-align: center;
+  }
+  .completion-banner.visible { display: block; }
+  .completion-banner h3 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .completion-banner p { font-size: 12px; color: var(--gray-400); }
+
+  /* Footer */
+  .footer {
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    padding: 24px 40px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--gray-400);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">celonis <span>Claude Enablement</span></div>
+  <div class="badge">PRE-WORK</div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Get ready for <em>Claude</em></h1>
+  <p class="sub">Complete the pre-work before the enablement session. Choose your level below — each path is designed for where you are today. Track your progress with the checklist.</p>
+</div>
+
+<!-- LEVEL SELECTOR -->
+<div class="level-selector">
+  <div class="level-card l1" onclick="selectLevel('l1')">
+    <div class="level-tag">Level 1</div>
+    <h3>New to Claude</h3>
+    <p>You've used AI tools like Gemini or ChatGPT, but haven't explored Claude yet. This path covers everything you need to get started.</p>
+    <div class="time">~3-4 hours</div>
+  </div>
+  <div class="level-card l2" onclick="selectLevel('l2')">
+    <div class="level-tag">Level 2</div>
+    <h3>Used Claude a few times</h3>
+    <p>You've tried Claude but haven't gone deep on Cowork, Skills, or Connectors. This path takes you from casual user to daily driver.</p>
+    <div class="time">~2 hours</div>
+  </div>
+  <div class="level-card l3" onclick="selectLevel('l3')">
+    <div class="level-tag">Level 3</div>
+    <h3>Power user</h3>
+    <p>You use Claude regularly and may already build skills or automations. Your mission: keep learning and prepare to help others.</p>
+    <div class="time">~1 hour</div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- L1 CONTENT -->
+<!-- ===================================================================== -->
+<div class="content-area" id="content-l1">
+
+  <div class="progress-container">
+    <div>
+      <div class="progress-label">Your progress</div>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill blue" id="progress-l1"></div>
+    </div>
+    <div class="progress-text" id="progress-text-l1">0 / 12</div>
+  </div>
+
+  <!-- Section 1: Setup -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num blue">1</div>
+      <h2>Account setup</h2>
+    </div>
+    <p class="section-desc">Get Claude running on your machine. This is the foundation for everything else.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Set up your Claude Enterprise account</div>
+        <div class="task-desc">Log in with your Celonis credentials. If you don't have access yet, contact IT (Max Reitmann).</div>
+        <a class="task-link" href="https://claude.ai" target="_blank">Open Claude &rarr;</a>
+      </div>
+      <div class="task-badge setup">Setup</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Download Claude Desktop app</div>
+        <div class="task-desc">Cowork only works in the desktop app. Download it and sign in with your account.</div>
+        <a class="task-link" href="https://claude.com/download" target="_blank">Download Claude Desktop &rarr;</a>
+      </div>
+      <div class="task-badge setup">Setup</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Connect your first connector</div>
+        <div class="task-desc">Go to Settings > Connectors and connect Google Drive, Gmail, or Calendar. This lets Claude access your real work context.</div>
+        <a class="task-link" href="https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities" target="_blank">Connectors guide &rarr;</a>
+      </div>
+      <div class="task-badge setup">Setup</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Learn -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num blue">2</div>
+      <h2>Learn the basics</h2>
+    </div>
+    <p class="section-desc">Understand what Claude can do and how it differs from other AI tools you've used.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Take Claude 101 on Anthropic Academy</div>
+        <div class="task-desc">Free course covering the fundamentals: writing, analysis, data, documents. You'll get a certificate at the end.</div>
+        <a class="task-link" href="https://anthropic.skilljar.com/" target="_blank">Open Anthropic Academy &rarr;</a>
+      </div>
+      <div class="task-badge video">Course</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Watch: Introduction to Claude Cowork</div>
+        <div class="task-desc">Understand the difference between Chat and Cowork. Cowork works with your files, folders, and apps directly on your machine.</div>
+        <a class="task-link" href="https://anthropic.skilljar.com/introduction-to-claude-cowork" target="_blank">Cowork course on Academy &rarr;</a>
+      </div>
+      <div class="task-badge video">Course</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Watch: Claude Skills explained (23 min)</div>
+        <div class="task-desc">Skills are reusable instructions that make Claude better at specific tasks. This video explains how they work and why they matter.</div>
+        <a class="task-link" href="https://www.youtube.com/watch?v=vEvytl7wrGM" target="_blank">Watch on YouTube &rarr;</a>
+      </div>
+      <div class="task-badge video">Video</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Read: Get started with Claude Cowork</div>
+        <div class="task-desc">Official guide covering the Cowork task loop, plugins, file workflows, and how to steer multi-step work.</div>
+        <a class="task-link" href="https://support.claude.com/en/articles/13345190-get-started-with-claude-cowork" target="_blank">Read guide &rarr;</a>
+      </div>
+      <div class="task-badge read">Read</div>
+    </div>
+
+    <div class="callout">
+      <strong>Tip:</strong> You don't need to learn Claude Code (the terminal tool) for now. Focus on Chat and Cowork — they cover 90% of VE/CS daily work without any coding.
+    </div>
+  </div>
+
+  <!-- Section 3: Try -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num blue">3</div>
+      <h2>Try it yourself</h2>
+    </div>
+    <p class="section-desc">Hands-on mini-exercises. The goal is to have at least one successful interaction before the session.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Exercise 1: Your first conversation</div>
+        <div class="task-desc">Open Claude Chat. Pick a customer account you know well. Ask: "I have a meeting with [company] tomorrow. Based on what you know, help me prepare talking points about their process mining maturity." See what happens.</div>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Exercise 2: Create an artifact</div>
+        <div class="task-desc">Ask Claude to create something visual: "Create a one-page executive summary of Celonis Process Intelligence for a CFO audience." Claude will produce an artifact you can preview, edit, and download.</div>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Exercise 3: Try Cowork</div>
+        <div class="task-desc">Open Cowork mode in Claude Desktop. Point it at a folder with a real document (e.g., a proposal, meeting notes). Ask: "Read this document and create a structured summary with key decisions and open items." Watch it work with your files directly.</div>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">Exercise 4: Install a skill</div>
+        <div class="task-desc">Browse our Celonis skills registry. Find one that looks useful for your work. Install it and try it on a real task.</div>
+        <a class="task-link" href="https://airtable.com/appQs16V7W924mdYJ/shrdhq4FiBvTD1eyq/tblhi1FOvO80NyuYR/viwcc4xCR7QKyUoiN" target="_blank">Open Celonis Skills Registry &rarr;</a>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+  </div>
+
+  <!-- Section 4: Reflect -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num blue">4</div>
+      <h2>Come prepared</h2>
+    </div>
+    <p class="section-desc">Think about these before the session. You'll be asked to share during the hands-on workshop.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l1">
+      <div class="task-content">
+        <div class="task-title">What's your #1 repetitive task?</div>
+        <div class="task-desc">Think about your daily work: meeting prep, documentation, research, proposals, data analysis. What takes the most time and could be partially automated? Write it down — you'll use it during the session.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Resources to explore:</strong><br>
+      <a href="https://skills.sh/" target="_blank" style="color:var(--blue);">skills.sh</a> — Community skills directory<br>
+      <a href="https://www.aitmpl.com/" target="_blank" style="color:var(--blue);">aitmpl.com</a> — 1000+ Claude templates and agents<br>
+      <a href="https://support.claude.com/en/articles/13837440-use-plugins-in-claude-cowork" target="_blank" style="color:var(--blue);">Plugins guide</a> — How to use plugins in Cowork<br>
+      <a href="https://www.anthropic.com/learn" target="_blank" style="color:var(--blue);">Anthropic Learn</a> — All learning resources from Anthropic
+    </div>
+  </div>
+
+  <div class="completion-banner" id="complete-l1">
+    <h3>You're ready!</h3>
+    <p>All pre-work completed. See you at the enablement session.</p>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- L2 CONTENT -->
+<!-- ===================================================================== -->
+<div class="content-area" id="content-l2">
+
+  <div class="progress-container">
+    <div><div class="progress-label">Your progress</div></div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill green" id="progress-l2"></div>
+    </div>
+    <div class="progress-text" id="progress-text-l2">0 / 8</div>
+  </div>
+
+  <!-- Section 1: Level up setup -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num green">1</div>
+      <h2>Level up your setup</h2>
+    </div>
+    <p class="section-desc">You have Claude — now make it truly useful by connecting it to your daily tools.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Connect all your connectors</div>
+        <div class="task-desc">Go to Settings > Connectors. Connect Gmail, Google Calendar, Google Drive, and Slack. The more context Claude has, the better it performs.</div>
+        <a class="task-link" href="https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities" target="_blank">Connectors guide &rarr;</a>
+      </div>
+      <div class="task-badge setup">Setup</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Install a Cowork plugin</div>
+        <div class="task-desc">Plugins bundle skills, connectors, and sub-agents into ready-to-go packages. Browse the marketplace and install one relevant to your role.</div>
+        <a class="task-link" href="https://support.claude.com/en/articles/13837440-use-plugins-in-claude-cowork" target="_blank">Plugins guide &rarr;</a>
+      </div>
+      <div class="task-badge setup">Setup</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Go deeper -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num green">2</div>
+      <h2>Go deeper on skills</h2>
+    </div>
+    <p class="section-desc">Skills are what make Claude specifically good at Celonis work. Learn how they work and explore what's available.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Take the Agent Skills course on Anthropic Academy</div>
+        <div class="task-desc">Learn how to build, configure, and share skills in Claude Code. Covers creating your first skill to distributing across teams.</div>
+        <a class="task-link" href="https://anthropic.skilljar.com/introduction-to-agent-skills" target="_blank">Open course &rarr;</a>
+      </div>
+      <div class="task-badge video">Course</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Browse the Celonis skills registry</div>
+        <div class="task-desc">Explore the internal Airtable with all available Celonis skills. Find 2-3 that are relevant to your daily work. Install them and try them out.</div>
+        <a class="task-link" href="https://airtable.com/appQs16V7W924mdYJ/shrdhq4FiBvTD1eyq/tblhi1FOvO80NyuYR/viwcc4xCR7QKyUoiN" target="_blank">Open Celonis Skills Registry &rarr;</a>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Browse the community skills directory</div>
+        <div class="task-desc">Explore skills.sh and aitmpl.com for inspiration. See what the community is building — templates, agents, automation workflows.</div>
+        <a class="task-link" href="https://skills.sh/" target="_blank">skills.sh &rarr;</a>&nbsp;&nbsp;
+        <a class="task-link" href="https://www.aitmpl.com/" target="_blank">aitmpl.com &rarr;</a>
+      </div>
+      <div class="task-badge read">Explore</div>
+    </div>
+  </div>
+
+  <!-- Section 3: Practice -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num green">3</div>
+      <h2>Practice with real work</h2>
+    </div>
+    <p class="section-desc">Use Claude on something real — not a toy example. The goal is to build a habit.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Use Cowork for a real task</div>
+        <div class="task-desc">Pick something from your actual work: prep for a customer meeting, create a proposal outline, analyze a document, build a presentation. Use Cowork end-to-end and note what worked and what didn't.</div>
+      </div>
+      <div class="task-badge exercise">Exercise</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l2">
+      <div class="task-content">
+        <div class="task-title">Think: what workflow would you automate?</div>
+        <div class="task-desc">Now that you've seen what's possible, identify one recurring workflow you'd like to turn into a skill. Come to the session ready to discuss it — we'll work on it during the hands-on workshop.</div>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <strong>Level 2 goal:</strong> Arrive at the session with Claude fully connected to your tools, at least 2-3 Celonis skills installed, and one real task completed in Cowork. You'll be ahead of most people in the room.
+    </div>
+  </div>
+
+  <div class="completion-banner" id="complete-l2">
+    <h3>You're ready!</h3>
+    <p>All pre-work completed. See you at the enablement session.</p>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- L3 CONTENT -->
+<!-- ===================================================================== -->
+<div class="content-area" id="content-l3">
+
+  <div class="progress-container">
+    <div><div class="progress-label">Your progress</div></div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill black" id="progress-l3"></div>
+    </div>
+    <div class="progress-text" id="progress-text-l3">0 / 5</div>
+  </div>
+
+  <!-- Section 1: Stay sharp -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num black">1</div>
+      <h2>Keep learning</h2>
+    </div>
+    <p class="section-desc">You're already ahead. These resources will help you go even further — but there's no mandatory to-do list for you.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l3">
+      <div class="task-content">
+        <div class="task-title">Take the Claude Code in Action course</div>
+        <div class="task-desc">Advanced course covering the full spectrum of Claude Code workflows: agents, MCP, advanced prompting, production deployments.</div>
+        <a class="task-link" href="https://anthropic.skilljar.com/claude-code-in-action" target="_blank">Open course &rarr;</a>
+      </div>
+      <div class="task-badge video">Course</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l3">
+      <div class="task-content">
+        <div class="task-title">Explore the Anthropic Cookbook</div>
+        <div class="task-desc">Advanced implementation examples: PDF processing, embeddings, citations, tool use patterns, multi-agent architectures.</div>
+        <a class="task-link" href="https://github.com/anthropics/anthropic-cookbook" target="_blank">Open Cookbook on GitHub &rarr;</a>
+      </div>
+      <div class="task-badge read">Explore</div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l3">
+      <div class="task-content">
+        <div class="task-title">Review the Celonis skills registry</div>
+        <div class="task-desc">Check what skills exist. Are there gaps? Could you contribute something from your workflow? Think about what you'd build or improve.</div>
+        <a class="task-link" href="https://airtable.com/appQs16V7W924mdYJ/shrdhq4FiBvTD1eyq/tblhi1FOvO80NyuYR/viwcc4xCR7QKyUoiN" target="_blank">Open Celonis Skills Registry &rarr;</a>
+      </div>
+      <div class="task-badge read">Review</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Help others -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num black">2</div>
+      <h2>Prepare to help others</h2>
+    </div>
+    <p class="section-desc">During the session, you'll be a resource for L1 and L2 participants. Think about how you can help.</p>
+    <hr class="sep">
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l3">
+      <div class="task-content">
+        <div class="task-title">Prepare a "show & tell" moment</div>
+        <div class="task-desc">Think about something impressive you've built with Claude — a skill, an automation, a workflow. Be ready to share it during the session as inspiration for others.</div>
+      </div>
+    </div>
+
+    <div class="task" onclick="toggleTask(this)">
+      <input type="checkbox" data-level="l3">
+      <div class="task-content">
+        <div class="task-title">Think about common questions beginners will have</div>
+        <div class="task-desc">You'll be sitting with L1/L2 participants during hands-on exercises. What questions did YOU have when you started? What tips would have saved you time? Come ready to mentor.</div>
+      </div>
+    </div>
+
+    <div class="callout black">
+      <strong>Your role during the session:</strong> You're not just a participant — you're a force multiplier. During hands-on exercises, help the people at your table. Answer questions. Show your workflow. The best enablement happens peer-to-peer, not top-down.
+    </div>
+  </div>
+
+  <div class="completion-banner" id="complete-l3">
+    <h3>You're ready!</h3>
+    <p>All pre-work completed. See you at the enablement session — your expertise will help everyone level up.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Celonis Claude Enablement &middot; Pre-work &middot; Internal use only &middot; Questions? Reach out on #claude-ve-cs-champions
+</div>
+
+<script>
+  // Level selection
+  function selectLevel(level) {
+    document.querySelectorAll('.level-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.level-card.' + level).classList.add('active');
+    document.querySelectorAll('.content-area').forEach(c => c.classList.remove('visible'));
+    document.getElementById('content-' + level).classList.add('visible');
+    updateProgress(level);
+  }
+
+  // Toggle task
+  function toggleTask(taskEl) {
+    const cb = taskEl.querySelector('input[type="checkbox"]');
+    if (event.target.tagName === 'A') return; // don't toggle when clicking links
+    cb.checked = !cb.checked;
+    taskEl.classList.toggle('done', cb.checked);
+    const level = cb.dataset.level;
+    updateProgress(level);
+    saveState();
+  }
+
+  // Update progress
+  function updateProgress(level) {
+    const checkboxes = document.querySelectorAll('#content-' + level + ' input[type="checkbox"]');
+    const total = checkboxes.length;
+    const done = Array.from(checkboxes).filter(c => c.checked).length;
+    const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+    const bar = document.getElementById('progress-' + level);
+    const text = document.getElementById('progress-text-' + level);
+    const banner = document.getElementById('complete-' + level);
+
+    if (bar) bar.style.width = pct + '%';
+    if (text) text.textContent = done + ' / ' + total;
+    if (banner) banner.classList.toggle('visible', done === total && total > 0);
+  }
+
+  // Persist state in memory (resets on page reload - no localStorage)
+  let savedState = {};
+  function saveState() {
+    document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => {
+      savedState[i] = cb.checked;
+    });
+  }
+
+  // Prevent checkbox default (we handle it in toggleTask)
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('click', e => e.preventDefault());
+  });
+</script>
+
+</body>
+</html>
